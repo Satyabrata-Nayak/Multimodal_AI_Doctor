@@ -12,6 +12,7 @@ from voice_of_doctor import text_to_speech_with_fallback
 
 #load_dotenv()
 
+
 text_prompt="""You have to act as a professional doctor, i know you are not but this is for learning purpose. 
             If you make a differential, suggest some remedies for them. Donot add any numbers or special characters in 
             your response. Your response should be in one long paragraph. Also always answer as if you are answering to a real person.
@@ -98,8 +99,10 @@ with gr.Blocks(title="AI Doctor with Vision, Voice, and Chat") as demo:
         inputs=[audio, image, chat_message, mode],
         outputs=[speech_to_text, doctor_response, response_audio]
     )
-
-demo.launch()
+demo.launch(
+    server_name="0.0.0.0",
+    server_port=int(os.environ.get("PORT", 7860))  # works for both Render and local
+)
 
 
 
