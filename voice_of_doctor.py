@@ -4,6 +4,7 @@ load_dotenv()
 
 #Step1a: Setup Text to Speech–TTS–model with gTTS
 import os
+import logging
 from gtts import gTTS
 import subprocess
 import elevenlabs
@@ -27,7 +28,7 @@ def text_to_speech_with_gtts(input_text, output_filepath):
 
 
 def text_to_speech_with_elevenlabs(input_text, output_filepath):
-    api_key = "sk_7ffcd17a76c6044f5d162ac2071ec8914d8c6a1ed845b646"
+    api_key = os.environ.get("ELEVEN_API_KEY")
     client = ElevenLabs(api_key=api_key)
 
     audio = client.text_to_speech.convert(
@@ -55,7 +56,8 @@ def text_to_speech_with_fallback(input_text, output_filepath="final.mp3"):
             output_filepath=output_filepath
         )
     except Exception as e:
-        print(f"ElevenLabs failed ({str(e)}). Falling back to gTTS")
+        logging.error(f"ElevenLabs TTS failed: {e}")
+        logging.info("Falling back to gTTS TTS.")
         return text_to_speech_with_gtts(
             input_text=input_text,
             output_filepath=output_filepath
