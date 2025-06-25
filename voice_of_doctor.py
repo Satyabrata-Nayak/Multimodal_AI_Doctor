@@ -27,7 +27,7 @@ def text_to_speech_with_gtts(input_text, output_filepath):
 
 
 def text_to_speech_with_elevenlabs(input_text, output_filepath):
-    api_key = "sk_9f4e10e0257a54d320429f6c56e6d4915898fae8f5173709"
+    api_key = "sk_7ffcd17a76c6044f5d162ac2071ec8914d8c6a1ed845b646"
     client = ElevenLabs(api_key=api_key)
 
     audio = client.text_to_speech.convert(
@@ -60,3 +60,5 @@ def text_to_speech_with_fallback(input_text, output_filepath="final.mp3"):
             input_text=input_text,
             output_filepath=output_filepath
         )
+
+# print(text_to_speech_with_fallback("Hello, this is a test.", "test.mp3"))
