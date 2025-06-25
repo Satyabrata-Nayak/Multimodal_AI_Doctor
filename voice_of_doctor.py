@@ -77,7 +77,8 @@ def text_to_speech_with_gtts(input_text, output_filepath):
 
 
 def text_to_speech_with_elevenlabs(input_text, output_filepath):
-    client = ElevenLabs(api_key=ELEVEN_API_KEY)
+    api_key = os.getenv("ELEVEN_API_KEY")
+    client = ElevenLabs(api_key=api_key)
 
     audio = client.text_to_speech.convert(
         text=input_text,
