@@ -51,9 +51,10 @@ def process_inputs(audio_filepath, image_filepath, chat_msg, mode):
 
     # Generate doctor's response
     doctor_response = analyze_image_with_query(
-        query=system_prompt + user_input,
+        query=user_input,
         encoded_image=encoded_img,
-        model="meta-llama/llama-4-scout-17b-16e-instruct"
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
+        base_prompt=system_prompt
     )
 
     # Generate voice output

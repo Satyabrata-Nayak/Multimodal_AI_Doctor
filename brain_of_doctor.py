@@ -24,12 +24,44 @@ model="meta-llama/llama-4-scout-17b-16e-instruct"
 #model = "meta-llama/llama-4-scout-17b-16e-instruct"
 #model="llama-3.2-90b-vision-preview" #Deprecated
 
-def analyze_image_with_query(query, model, encoded_image=None):
+#================================RAG================================
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.documents import Document
+from langchain_core.prompts import ChatPromptTemplate
+
+DB_FAISS_PATH = "vectorstore/db_faiss"
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+db = FAISS.load_local(DB_FAISS_PATH, embeddings=embedding_model, allow_dangerous_deserialization=True)
+#====================================================================
+
+
+
+def analyze_image_with_query(query, model, encoded_image=None,base_prompt=None):
+    
+    #=======rag retrieval========
+    docs = db.similarity_search(query, k=3)
+    retrieved_context = "\n".join([doc.page_content for doc in docs])
+
+    full_prompt = f"""
+    You are a helpful medical assistant. Answer the query as a doctor.
+
+    User Query:
+    {query}
+
+    Below is some Retrieved Context if you find them useful for your answer then use them, otherwise ignore them.
+
+    Retrieved Context:
+    {retrieved_context}  
+    
+    """
+    #========================================
+
     client = Groq()
-    messages = [{"role": "user", "content": []}]
+    messages = [{"role": "user", "content": []},{"role": "system", "content":  str(base_prompt) if base_prompt else "You are a helpful medical assistant."}]
     
     # Add text query
-    messages[0]["content"].append({"type": "text", "text": query})
+    messages[0]["content"].append({"type": "text", "text": str(full_prompt)})
     
     # Add image if provided
     if encoded_image:
@@ -37,7 +69,7 @@ def analyze_image_with_query(query, model, encoded_image=None):
             "type": "image_url",
             "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}
         })
-    
+    print("!####\n",messages)
     response = client.chat.completions.create(
         messages=messages,
         model=model
